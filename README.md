@@ -1,267 +1,360 @@
-# 🚀 Claude Code Router: Master Setup Guide (WSL + Gemini)
+# Gemini CLI Complete Guide: Setup & Configuration
 
-[![Watch the Tutorial](https://img.youtube.com/vi/Kerha8oWWug/maxresdefault.jpg)](https://youtu.be/Kerha8oWWug)
+## What is Gemini CLI?
 
-> **📺 Watch the Video:** [Click here to watch the full step-by-step tutorial](https://youtu.be/Kerha8oWWug)  
+Gemini CLI is an open-source AI agent that runs directly in your terminal. It helps with coding tasks, file operations, and general queries. The tool comes with built-in features and supports MCP servers.
 
-This repository is the official guide for my YouTube tutorial. It helps you set up Claude Code on Windows using WSL2 and powers it with Google Gemini using the Claude Code Router.
-
----
-
-## 🛠 Step 0: Install Windows Subsystem for Linux (WSL)
-
-**Important:** This is the first thing you need to do. We are setting up a Linux environment where **Claude Code** will run.
-
-### 1. Open PowerShell as Administrator
-
-* Press the **Windows** key
-* Search for **PowerShell**
-* Click **Run as administrator**
-* Click **Yes**
-
-### 2. Run the Install Command
-
-```powershell
-wsl --install
-```
-
-### 3. Downloading & Launching
-
-* Windows will download and install WSL
-* Ubuntu will launch automatically
-* Stay in the same window while it provisions
-
-### 4. Set Your Username & Password
-
-* Enter a **username**
-* Enter a **password**
-* Confirm the password
-
-> ⚠️ Password typing is hidden. This is normal in Linux.
-
-### 5. Success
-
-When you see something like:
-
-```bash
-hammad@PC:/mnt/c/WINDOWS/system32$
-
-```
-
-Keep this terminal open and continue.
+**Free Tier Benefits:**
+- 60 requests per minute
+- 1,000 requests per day (with personal Google account)
 
 ---
 
-## ⚡ Method 1: Automated "Speedrun" Script
+## Installation & Setup
 
-### 1. Run the Installer
-Inside your **WSL / Ubuntu** terminal, run:
+### Requirements
 
-```bash
-curl -sSL https://raw.githubusercontent.com/devhammad0/claude-code-router-setup/main/scripts/install.sh | bash
+- Node.js version 20 or higher
 
-```
-
-> After the script finishes:
+### Installation Steps
 
 ```bash
-source ~/.bashrc
-```
+# Install Gemini CLI globally
+npm install -g @google/gemini-cli
 
-### 2. Set Your Google API Key
-Replace `YOUR_KEY_HERE` with your key from <a href="https://aistudio.google.com/" target="_blank">Google AI Studio</a>:
+# Check version
+gemini -v
 
-```bash
-echo 'export GOOGLE_API_KEY="YOUR_KEY_HERE"' >> ~/.bashrc
-```
-
-### 3. Reload your Environment
-
-```bash
-source ~/.bashrc
-```
-
-### 4. Laucnh Claude Code Router
-
-```bash
-ccr code
+# Upgrade to latest version
+npm upgrade -g @google/gemini-cli
 ```
 
 ---
 
-## 🛠 Method 2: Manual Installation (Step-by-Step)
+## First Launch
 
-### 1. Update Linux Packages
+Start Gemini CLI:
 
 ```bash
-sudo apt update && sudo apt upgrade -y
-sudo apt install -y curl git build-essential
+gemini
 ```
 
-### 2. Install Node.js (via NVM)
+### Initial Setup
+
+1. **Choose Theme**: Select your preferred color theme
+2. **Authentication**: Choose login method
+   - **Google Login** (Recommended): Free tier access
+   - **Gemini API Key**: For higher quota needs
+   - **Vertex AI**: For Google Cloud projects
+
+---
+
+## Understanding the Interface
+
+
+### Essential Commands
 
 ```bash
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
-source ~/.bashrc
-nvm install --lts
+/help        # Show all commands and shortcuts
+/docs        # Open documentation
+/stats       # View session statistics
+/tools       # List available tools
+/quit        # Exit (or press Ctrl-C twice)
 ```
 
-### 3. Install Claude Code & CCR Router
+### Using Files in Context
+
+Use `@` to reference files:
+```
+Explain @app.py
+Update @README.md with installation steps
+```
+
+### Shell Mode
+
+Toggle shell mode with `!` to run terminal commands:
 
 ```bash
-npm install -g @anthropic-ai/claude-code @musistudio/claude-code-router
+!           # Enable shell mode
+pwd         # Run commands
+ESC         # Exit shell mode
 ```
 
 ---
 
-## ⚙️ Configuration Setup
+## Command Line Options
 
-### Step 1: Check Your Shell (Important)
-
-Run:
+### Version Check
 
 ```bash
-echo $SHELL
+gemini -v           # Check current version
+gemini --version
 ```
 
-* If output contains `/bash` → use `~/.bashrc`
-* If output contains `/zsh` → use `~/.zshrc`
+### Model Selection
+
+```bash
+gemini -m "gemini-flash-2.5"    # Use Flash model
+gemini -m "gemini-pro-2.5"      # Use Pro model
+```
+
+**Note**: Free tier may auto-switch to Flash due to quota limits.
+
+### Single Prompt Mode
+
+Run without interactive interface:
+
+```bash
+# Using prompt parameter
+gemini -p "What is the gcloud command to deploy to Cloud Run"
+
+# Using positional prompt (preferred)
+gemini "What is the gcloud command to deploy to Cloud Run"
+```
+
+### Debug Mode
+
+See detailed execution information:
+
+```bash
+gemini -d                       # Launch with debug
+gemini -d -p "your prompt"      # Debug with single prompt
+```
+
+Debug mode shows:
+- Authentication method
+- GEMINI.md file search paths
+- Context loading process
+- Memory usage
+
+### Session Summary
+
+Save session metrics to file:
+
+```bash
+gemini --session-summary "session.txt"
+```
+
+Tracks:
+- Model usage
+- API calls
+- Token consumption
+- Tool usage statistics
+
+### YOLO Mode (Use Carefully!)
+
+Auto-accept all actions:
+
+```bash
+gemini -y
+gemini --yolo
+```
+
+**Warning**: This automatically approves file writes and other operations.
 
 ---
 
-### Step 2: Create Config File (Google Gemini)
+## Working with GEMINI.md Files
+
+### Purpose
+
+`GEMINI.md` files provide instructions to the AI about:
+- Coding style preferences
+- Project-specific rules
+- Framework versions
+- Dependencies management
+
+### File Hierarchy
+
+Context loads in this order (specific overrides general):
+
+1. **Global**: `~/.gemini/GEMINI.md` - Rules for all projects
+2. **Project Root**: Project-wide instructions
+3. **Local**: Subdirectory-specific rules
+
+### View Current Context
 
 ```bash
-mkdir -p ~/.claude-code-router ~/.claude
+/memory show        # Display loaded context
+/memory refresh     # Reload GEMINI.md files
 ```
 
-Run the following command to create your configuration:
+### Example GEMINI.md
 
-```json
-cat > ~/.claude-code-router/config.json << 'EOF'
-{
-  "LOG": true,
-  "LOG_LEVEL": "info",
-  "HOST": "127.0.0.1",
-  "PORT": 3456,
-  "APIKEY": "your_secure_password_here",
-  "API_TIMEOUT_MS": 600000,
-  "Providers": [
-    {
-      "name": "gemini",
-      "api_base_url": "https://generativelanguage.googleapis.com/v1beta/models/",
-      "api_key": "$GOOGLE_API_KEY",
-      "models": [
-        "gemini-3-flash-preview",
-        "gemini-3-pro-preview",
-        "gemini-2.5-flash-lite",
-        "gemini-2.0-flash"
-      ],
-      "transformer": { "use": ["gemini"] }
-    }
-  ],
-  "Router": {
-    "default": "gemini,gemini-2.5-flash-lite",
-    "background": "gemini,gemini-2.5-flash-lite",
-    "think": "gemini,gemini-2.5-flash-lite",
-    "longContext": "gemini,gemini-2.5-flash-lite",
-    "longContextThreshold": 60000
-  }
-}
-EOF
+```markdown
+# Project Guidelines
+
+## Code Style
+- Use TypeScript strict mode
+- Follow ESLint rules
+- 2-space indentation
+
+## Dependencies
+- React 18.x
+- Node.js 20+
+
+## Testing
+- Write tests for all functions
+- Use Jest framework
 ```
 
 ---
 
-### 📊 Model Performance & Quota (Free Tier)
+## Built-in Tools
 
-Before you run the agent, check the current limits for the models included in the config above. These limits are reset at **Midnight Pacific Time (PT)**.
-
-| Model Name | RPM (Req/Min) | TPM (Tokens/Min) | RPD (Req/Day) | Status/Notes |
-| :--- | :---: | :---: | :---: | :--- |
-| **gemini-2.5-flash-lite** | **30** | 1,000,000 | **1,500** | ✅ **Recommended for Coding** |
-| **gemini-2.0-flash** | 10 | 1,000,000 | 1,000 | Stable legacy option |
-| **gemini-3-flash-preview**| 2 | 100,000 | 100 | ⚠️ Strict preview limits |
-| **gemini-3-pro-preview** | 0 - 2* | 32,000 | 5 - 10 | 🚫 Effectively Paid-Only |
-
----
-
-> **Free Tier Quota Note:**  
->
-> * **RPM** (Requests Per Minute) is strictly enforced. If Claude Code fires multiple background file reads, you may hit a brief 429 error.
-> * **Gemini 3 Pro Preview** is currently highly restricted for free users; frequent use in the `think` or `longContext` routes will likely exhaust your daily quota (RPD) in minutes.
->
-> **TIP:**  
-> ***Why use Flash-Lite?** *Claude Code performs many small background tasks (reading files, checking status). Using a model with less than 10 RPM will cause "Rate Limit" errors almost immediately. Flash-Lite is the only free model that provides a smooth experience for complex coding.*
-
-
----
-
-### Step 3: Set API Key
-
-Use the shell configuration file you identified in Step 1. Replace `YOUR_KEY_HERE` with your actual Google AI Studio API key.
-
-**If using bash:**
+View available tools:
 
 ```bash
-echo 'export GOOGLE_API_KEY="YOUR_KEY_HERE"' >> ~/.bashrc
-source ~/.bashrc
+/tools
 ```
 
-**If using zsh:**
+Common tools include:
+- **GoogleSearch**: Search the web
+- **ReadFile**: Read file contents
+- **WriteFile**: Create/modify files
+- **mkdir**: Create directories
+- **Shell**: Execute terminal commands
+
+**Tool Permissions**: Gemini CLI asks before using tools. Options:
+- Allow once
+- Always allow
+- Reject
+- Modify and allow
+
+---
+
+## Project Structure Best Practices
+
+### Start from Project Folder
+
+Always launch Gemini CLI from your project directory:
 
 ```bash
-echo 'export GOOGLE_API_KEY="YOUR_KEY_HERE"' >> ~/.zshrc
-source ~/.zshrc
+cd ~/my-projects/current-project
+gemini
 ```
 
 ---
 
-## 🚀 How to Run
+## Practical Example: Building a Web App
 
+### Task: Cricket Score Viewer
+
+**Prompt:**
+```
+Create a Python Flask application that displays live cricket scores from this RSS feed:
+https://static.cricinfo.com/rss/livescores.xml
+```
+
+**What Happens:**
+1. Gemini CLI asks permission to create folders
+2. Generates Python code and HTML templates
+3. Identifies dependencies (Flask, requests, feedparser)
+4. Asks to install packages
+5. Starts Flask server
+6. Handles port conflicts automatically
+
+**Result**: Working web application with minimal input.
+
+---
+
+## Tips & Best Practices
+
+### DO:
+- Launch from your project directory
+- Review tool permissions before accepting
+- Use GEMINI.md for consistent results
+- Enable checkpointing for safety
+- Keep Gemini CLI updated
+
+### DON'T:
+- Run from home directory
+- Use YOLO mode by default
+- Ignore tool permission prompts
+- Skip updating regularly
+
+---
+
+## Common Workflows
+
+### Quick Terminal Help
 ```bash
-ccr code
+gemini "show me git commands for rebasing"
+```
+
+### Generate Code
+```bash
+cd my-project
+gemini
+> Create a REST API with user authentication
+```
+
+### Modify Existing Files
+```bash
+gemini
+> In @app.py, add error handling to all functions
+```
+
+### Restore Previous State
+```bash
+gemini -c
+> (make changes)
+> /restore
+> (select checkpoint to restore)
 ```
 
 ---
 
-## 💡 Essential Commands
+## Troubleshooting
 
-* `ccr start` / `ccr stop` / `ccr status` — Manage the background router service.
-* `ccr model` — Quick interactive configuration of your model providers.
-* `ccr ui` → Dashboard at `http://localhost:3456`
+### Model Switches to Flash
+**Issue**: Pro model auto-switches to Flash  
+**Solution**: Use Gemini API Key for higher quota
+
+### No Context Loading
+**Issue**: GEMINI.md not found  
+**Solution**: Check file location with `gemini -d`
+
+### Port Already in Use
+**Issue**: Server won't start  
+**Solution**: Ask Gemini to use different port
+
 ---
 
+## Next Steps
 
-## ❓ Troubleshooting
+This guide covers installation, configuration, and basic usage. Upcoming topics:
+- Configuration files (settings.json, .env)
+- MCP server integration
+- Custom slash commands
+- VS Code integration
+- Advanced context management
 
-### 1. Service Startup Timeout  
+---
 
-If `ccr code` shows a "Timeout" error, the background service might just need a manual kickstart. Run these separately:  
-
-```bash
-ccr start
-ccr code
-```
-
-### 2. Status shows "Not Running"  
-
-This usually means a "ghost" process is already using the port. Run this to clear it:
+## Quick Reference
 
 ```bash
-# Find any process on port 3456
-sudo lsof -i :3456
-# Use the PID found to kill it: sudo kill -9 <PID>
+# Installation
+npm install -g @google/gemini-cli
+
+# Launch
+gemini                          # Interactive mode
+gemini "prompt"                 # Single prompt
+gemini -m "model"               # Choose model
+gemini -c                       # With checkpointing
+gemini -d                       # Debug mode
+
+# Inside CLI
+/help                           # Show commands
+/tools                          # List tools
+/memory show                    # View context
+/restore                        # Restore checkpoint
+/quit                           # Exit
+!                               # Shell mode
+@filename                       # Reference file
 ```
 
-### 3. Verification Commands  
+---
 
-Use these commands to verify your setup:
-
-- `ccr status` — Check if the background service is running.
-- `/status` — (Inside Claude) Verify the Base URL is 127.0.0.1:3456.
-
----  
-
-**Maintained by Muhammad Hammad** | [LinkedIn Profile](https://www.linkedin.com/in/devhammad0)
-
+**Pro Tip**: Start small, experiment with simple tasks, and gradually add GEMINI.md instructions as you learn what works best for your workflow.
